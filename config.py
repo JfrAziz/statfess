@@ -12,6 +12,7 @@ ACCESS_TOKEN = str(os.getenv('ACCESS_TOKEN'))
 ACCESS_TOKEN_SECRET = str(os.getenv('ACCESS_TOKEN_SECRET'))
 TRIGER_WORD = str(os.getenv('TRIGER_WORD'))
 
+
 def create_api():
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)

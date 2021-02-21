@@ -1,22 +1,28 @@
-import tweepy
 import html
+import re
+import tempfile
+import config as c
+import requests
+import tweepy
+from requests_oauthlib import OAuth1
 
 
 class TwitterBot:
-    def __init__(self, api, trigger_word="", direct_messages=0):
-        self.api = api
-        self.direct_messages = direct_messages
-        self.trigger_word = trigger_word
+    def __init__(self):
+        self.api = c.create_api()
+        self.direct_messages = []
+        self.trigger_word = c.TRIGER_WORD
         self.me = self.api.me()
 
     def __get_all_dm(self):
         self.direct_messages = self.api.list_direct_messages()
         print("Total incoming message : ", len(self.direct_messages))
 
+    # TODO : add video attachment
     def __post_all(self):
         for i, dm in enumerate(reversed(self.direct_messages)):
             sender_id = dm.message_create['sender_id']
-
+            media_ids = []
             if sender_id == str(self.me.id):
                 continue
 
@@ -28,28 +34,38 @@ class TwitterBot:
                 self.__send_response(sender_id, "FAILED")
                 continue
 
+            if 'attachment' in message_data:
+                if message_data['attachment']['media']['type'] == 'photo':
+                    media_url = message_data['attachment']['media']['media_url']
+                    media_id = self.__get_photo_id(media_url)
+                    media_ids.append(media_id)
+                    text = ' '.join(
+                        re.sub(r"(@[A-Za-z0-9]+)|(\w+:\/\/\S+)", " ", text).split())
+                else:
+                    continue
+
             if len(text) > 280:
                 try:
-                    self.__post_thread(text, sender_id)
+                    self.__post_thread(sender_id, text, media_ids)
                 except Exception as e:
                     print("[ERROR] ", e)
                 continue
 
             try:
-                self.__post_tweet(text, sender_id)
+                self.__post_tweet(sender_id, text, media_ids)
                 self.__send_response(sender_id, "SUCCESS")
             except Exception as e:
                 print("[ERROR] ", e)
-                self.__send_response(sender_id, "ERROR")
-                continue
 
-    def __post_thread(self, text, sender_id):
+    # TODO : make better cut of text
+    def __post_thread(self, sender_id, text, media_ids=[]):
         print("[THREAD] from ", sender_id)
         status_id = 0
         while len(text) > 280:
-            tweet = text[0:272] + " .... "
+            tweet = text[0:272] + " ... "
             if status_id == 0:
-                status_send = self.api.update_status(tweet)
+                status_send = self.api.update_status(
+                    tweet, media_ids=media_ids)
                 status_id = status_send.id
                 print("[TWEET] ", tweet)
             else:
@@ -58,7 +74,7 @@ class TwitterBot:
                     auto_populate_reply_metadata=True)
                 status_id = status_send.id
                 print("[TWEET] ", tweet)
-            text = " .... "+text[272:len(text)]
+            text = " ... "+text[272:len(text)]
         if status_id != 0:
             print("[TWEET] ", text)
             self.api.update_status(
@@ -66,12 +82,25 @@ class TwitterBot:
                 auto_populate_reply_metadata=True)
             self.__send_response(sender_id, "SUCCESS")
 
-    def __post_tweet(self, text, sender_id):
+    def __post_tweet(self, sender_id, text, media_ids=[]):
         print("[TWEET] from ", sender_id, ", tweet : ", text)
-        self.api.update_status(text)
+        self.api.update_status(text,  media_ids=media_ids)
 
-    def __post_media(self):
-        return
+    def __get_photo_id(self, media_url):
+        oauth = OAuth1(client_key=c.CONSUMER_KEY,
+                       client_secret=c.CONSUMER_SECRET,
+                       resource_owner_key=c.ACCESS_TOKEN,
+                       resource_owner_secret=c.ACCESS_TOKEN_SECRET)
+        respon = requests.get(media_url, auth=oauth)
+        tmp = tempfile.NamedTemporaryFile()
+        if respon.status_code == 200:
+            with open(tmp.name, 'wb') as image:
+                for chunk in respon:
+                    image.write(chunk)
+            photo_ids = self.api.media_upload(tmp.name).media_id
+        else:
+            photo_ids = []
+        return photo_ids
 
     def __send_response(self, sender_id, status="SUCCESS"):
         if sender_id == str(self.me.id):
@@ -98,7 +127,6 @@ class TwitterBot:
                 print("Deleting DM NO.", i)
             except Exception as e:
                 print("Error : ", e)
-                continue
 
     def run(self):
         self.__get_all_dm()
