@@ -22,7 +22,7 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN}}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
           TIME_SLEEP: 60
-          TRIGER_WORD: statfess!
+          TRIGER_WORD: stat!
           DOCKER_PATH: ${{ secrets.DOCKER_PATH}}
         with:
           host: ${{ secrets.HOST }}
@@ -35,7 +35,12 @@ jobs:
             cd $DOCKER_PATH
             git pull
             docker build -t statfess .
-            docker run -it -d -e CONSUMER_KEY="$CONSUMER_KEY" \
+            docker stop statfess
+            docker logs statfess > logs/"$(date +"%Y_%m_%d_%I_%M_%p").log"
+            docker rm statfess
+            docker logs statfess > logs/output.log
+            docker run -it -d --name statfess \
+            -e CONSUMER_KEY="$CONSUMER_KEY" \
             -e CONSUMER_SECRET="$CONSUMER_SECRET" \
             -e ACCESS_TOKEN="$ACCESS_TOKEN" \
             -e ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" \
