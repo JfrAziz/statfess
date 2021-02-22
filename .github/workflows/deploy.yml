@@ -21,7 +21,7 @@ jobs:
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET}}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN}}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
-          TIME_SLEEP: 60
+          TIME_SLEEP: 30
           TRIGER_WORD: stat!
           DOCKER_PATH: ${{ secrets.DOCKER_PATH}}
         with:

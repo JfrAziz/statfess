@@ -1,3 +1,15 @@
 # Simple Twitter Auto Base
 
-TODO : Add documentation
+Buat environments variabel pake file env, rename jadi .env kemudian isi dengan consumer key, access token, dll. Triger word digunakan untuk mentriger pesan agar dikirim. kemudian sleep time waktu yang dibutuhkan untuk sekali pengecekan. Kalau mau menggunakan docker, build image docker nya. kemudian jalankan containernya
+
+```bash
+docker build -t statfess .
+docker run -it -d --name statfess \
+-e CONSUMER_KEY="CONSUMER_KEY" \
+-e CONSUMER_SECRET="CONSUMER_SECRET" \
+-e ACCESS_TOKEN="ACCESS_TOKEN" \
+-e ACCESS_TOKEN_SECRET="ACCESS_TOKEN_SECRET" \
+-e TRIGER_WORD="TRIGER_WORD" \
+-e TIME_SLEEP=TIME_SLEEP \
+statfess
+```
