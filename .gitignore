@@ -1,5 +1,6 @@
 __pycache__
 statfess
+/logs
 .vscode
 .env
 .log
