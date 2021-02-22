@@ -23,15 +23,16 @@ jobs:
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
           TIME_SLEEP: 60
           TRIGER_WORD: statfess!
+          DOCKER_PATH: ${{ secrets.DOCKER_PATH}}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          envs: CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET, TIME_SLEEP, TRIGER_WORD
+          envs: CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET, TIME_SLEEP, TRIGER_WORD, DOCKER_PATH
           script: |
             whoami
-            cd var/docker/statfess
+            cd $DOCKER_PATH
             git pull
             docker build -t statfess .
             docker run -it -d -e CONSUMER_KEY="$CONSUMER_KEY" \
