@@ -15,8 +15,11 @@ class TwitterBot:
         self.me = self.api.me()
 
     def __get_all_dm(self):
-        self.direct_messages = self.api.list_direct_messages()
-        print("Total incoming message : ", len(self.direct_messages))
+        try:
+            self.direct_messages = self.api.list_direct_messages()
+            print("[INFO] Total incoming message : ", len(self.direct_messages))
+        except Exception as e:
+            print("[ERROR] ", e)
 
     # TODO : add video attachment
     def __post_all(self):

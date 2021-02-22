@@ -1,0 +1,44 @@
+name: Deploy Project
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "Build and Deploy"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        env:
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET}}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN}}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
+          TIME_SLEEP: 60
+          TRIGER_WORD: statfess!
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          envs: CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET, TIME_SLEEP, TRIGER_WORD
+          script: |
+            whoami
+            cd var/docker/statfess
+            git pull
+            docker build -t statfess .
+            docker run -it -d -e CONSUMER_KEY="$CONSUMER_KEY" \
+            -e CONSUMER_SECRET="$CONSUMER_SECRET" \
+            -e ACCESS_TOKEN="$ACCESS_TOKEN" \
+            -e ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" \
+            -e TRIGER_WORD="$TRIGER_WORD" \
+            -e TIME_SLEEP=$TIME_SLEEP \
+            statfess
+            docker ps -a

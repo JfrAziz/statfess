@@ -11,6 +11,7 @@ CONSUMER_SECRET = str(os.getenv('CONSUMER_SECRET'))
 ACCESS_TOKEN = str(os.getenv('ACCESS_TOKEN'))
 ACCESS_TOKEN_SECRET = str(os.getenv('ACCESS_TOKEN_SECRET'))
 TRIGER_WORD = str(os.getenv('TRIGER_WORD'))
+TIME_SLEEP = int(os.getenv('TIME_SLEEP'))
 
 
 def create_api():
