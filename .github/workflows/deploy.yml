@@ -38,7 +38,6 @@ jobs:
             docker stop statfess
             docker logs statfess > logs/"$(date +"%Y_%m_%d_%I_%M_%p").log"
             docker rm statfess
-            docker logs statfess > logs/output.log
             docker run -it -d --name statfess \
             -e CONSUMER_KEY="$CONSUMER_KEY" \
             -e CONSUMER_SECRET="$CONSUMER_SECRET" \
