@@ -33,7 +33,7 @@ class TwitterBot:
             text = html.unescape(message_data['text'])
             print("[MESSAGE] from ", sender_id, " [TEXT] ", text)
 
-            if self.trigger_word not in text:
+            if self.trigger_word.lower() not in text.lower():
                 print("[FAILED] tweeting from DM NO.", i)
                 self.__send_response(sender_id, "FAILED")
                 continue
@@ -112,11 +112,11 @@ class TwitterBot:
         if status == "SUCCESS":
             self.api.send_direct_message(
                 recipient_id=sender_id,
-                text="Thank You, we will process your message")
+                text="Terima kasih, pesanmu sudah terkirim")
         if status == "FAILED":
             self.api.send_direct_message(
                 recipient_id=sender_id,
-                text="Failed, please check your message")
+                text="Gagal, cek lagi ya pesan yang kamu kirim")
         if status == "ERROR":
             self.api.send_direct_message(
                 recipient_id=sender_id,
