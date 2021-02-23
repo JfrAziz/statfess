@@ -31,6 +31,7 @@ class TwitterBot:
 
             message_data = dm.message_create['message_data']
             text = html.unescape(message_data['text'])
+            print("[MESSAGE] from ", sender_id, " [TEXT] ", text)
 
             if self.trigger_word not in text:
                 print("[FAILED] tweeting from DM NO.", i)
@@ -120,16 +121,16 @@ class TwitterBot:
             self.api.send_direct_message(
                 recipient_id=sender_id,
                 text="You got an rrror, keep calm it's not your fault")
-        print("Sending respon to ", sender_id, " with status : ", status)
+        print("[RESPONSE] Sending respon to ", sender_id, " with status : ", status)
 
     def __delete_direct_messages(self):
         direct_messages = self.direct_messages
         for i, dm in enumerate(reversed(direct_messages)):
             try:
                 self.api.destroy_direct_message(dm.id)
-                print("Deleting DM NO.", i)
+                print("[DELETE] Deleting DM NO.", i)
             except Exception as e:
-                print("Error : ", e)
+                print("[ERROR] ", e)
 
     def run(self):
         self.__get_all_dm()
